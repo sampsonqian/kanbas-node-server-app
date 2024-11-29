@@ -1,4 +1,5 @@
 import * as enrollmentDao from "./dao.js";
+import * as courseDao from "../Courses/dao.js"
 
 export default function EnrollmentRoutes(app) {
   // Enroll a user from a course
@@ -20,16 +21,14 @@ export default function EnrollmentRoutes(app) {
 
   app.get("/api/enrollments/:userId", async (req, res) => {
     const { userId } = req.params;
-  
-    if (!userId) {
-      return res.status(400).json({ error: "userId is required" });
-    }
-  
-    const enrollments = Database.enrollments.filter(
-      (enrollment) => enrollment.user === userId
-    );
-  
+
+
+
+    const enrollments = courseDao.findCoursesForEnrolledUser(userId);
+    //  Database.enrollments.filter(
+    //   (enrollment) => enrollment.user === userId
+    // );
+
     res.status(200).json(enrollments);
   });
-  
 }
