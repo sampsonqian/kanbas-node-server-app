@@ -1,4 +1,5 @@
 import * as assignmentDao from "./dao.js";
+import Database from "../Database/index.js";
 
 export default function AssignmentRoutes(app) {
     app.delete("/api/assignments/:assignmentID", async (req, res) => {
@@ -13,11 +14,5 @@ export default function AssignmentRoutes(app) {
         res.send(newAssignment);
       });
 
-      app.get("/api/enrollments/:userId", async (req, res) => {
-        const { userId } = req.params;
-        const enrollments = Database.enrollments.filter(
-          (enrollment) => enrollment.user === userId
-        );
-        res.json(enrollments);
-      });
+     
 }
