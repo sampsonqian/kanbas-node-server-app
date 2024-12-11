@@ -4,13 +4,12 @@ import * as assignmentsDao from "../Assignments/dao.js";
 import * as enrollmentsDao from "../Enrollments/dao.js";
 
 export default function CourseRoutes(app) {
-    const findUsersForCourse = async (req, res) => {
-        const { cid } = req.params;
-        const users = await enrollmentsDao.findUsersForCourse(cid);
-        res.json(users);
-      };
-      app.get("/api/courses/:cid/users", findUsersForCourse);
-
+  const findUsersForCourse = async (req, res) => {
+    const { cid } = req.params;
+    const users = await enrollmentsDao.findUsersForCourse(cid);
+    res.json(users);
+  };
+  app.get("/api/courses/:cid/users", findUsersForCourse);
 
   app.get("/api/courses", async (req, res) => {
     const courses = await dao.findAllCourses();
@@ -23,10 +22,9 @@ export default function CourseRoutes(app) {
     if (currentUser) {
       await enrollmentsDao.enrollUserInCourse(currentUser._id, course._id);
     }
- 
+
     res.json(course);
   });
- 
 
   app.delete("/api/courses/:courseId", async (req, res) => {
     const { courseId } = req.params;
@@ -41,11 +39,28 @@ export default function CourseRoutes(app) {
     res.send(status);
   });
 
-
   app.get("/api/courses/:courseId/modules", async (req, res) => {
-    const { courseId } = req.params;
-    const modules = await modulesDao.findModulesForCourse(courseId);
-    res.json(modules);
+    try {
+      const { courseId } = req.params;
+
+      // Log the incoming courseId
+      console.log("Received request to fetch modules for courseId:", courseId);
+
+      // Fetch modules from the database
+      const modules = await modulesDao.findModulesForCourse(courseId);
+
+      // Log the fetched modules
+      console.log("Modules fetched from database:", modules);
+
+      // Respond with the modules
+      res.json(modules);
+    } catch (error) {
+      // Log any errors that occur
+      console.error("Error fetching modules:", error);
+
+      // Respond with a 500 status code and error message
+      res.status(500).json({ error: "Error fetching modules" });
+    }
   });
 
   app.post("/api/courses/:courseId/modules", async (req, res) => {
@@ -58,24 +73,19 @@ export default function CourseRoutes(app) {
     res.send(newModule);
   });
 
-
   // assignments
-  app.get("/api/courses/:courseId/assignments", (req, res) => {
+  app.get("/api/courses/:courseId/assignments", async (req, res) => {
     const { courseId } = req.params;
-    const assignments = assignmentsDao.findAssignmentsForCourse(courseId);
+    const assignments = await assignmentsDao.findAssignmentsForCourse(courseId);
     res.json(assignments);
   });
-  app.post("/api/courses/:courseId/assignments", (req, res) => {
+  app.post("/api/courses/:courseId/assignments", async (req, res) => {
     const { courseId } = req.params;
     const assignment = {
       ...req.body,
       course: courseId,
     };
-    const newAssignment = assignmentsDao.createAssignment(assignment);
+    const newAssignment = await assignmentsDao.createAssignment(assignment);
     res.send(newAssignment);
   });
-
-
-
 }
-
